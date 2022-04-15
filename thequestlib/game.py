@@ -1,79 +1,28 @@
-from typing import Text
 import pygame as pg
-from random import randint
-from thequestlib import BLACK, GAME_FONT, STARS_AMOUNT, STAR_SPEEDS
-from thequestlib.sprites import Obstacle, Spaceship, Star, TextDisplay
+from thequestlib import FONT_SIZE, GAME_FONT, LIVES
+from thequestlib.modes import Level
 
 class Game:
     def __init__(self):
         self.displayinfo = pg.display.Info()
         self.screen = pg.display.set_mode((self.displayinfo.current_w, self.displayinfo.current_h))
-        self.font = pg.font.Font("freesansbold.ttf", 32)
+        self.font = pg.font.Font(GAME_FONT, FONT_SIZE)
+        self.flags = {
+            "game_over": False,
+            "next_level": True
+        }
         
-        self.lives = 3
-        self.stars = pg.sprite.Group()
-        self.meteorites = pg.sprite.Group()
-        self.spaceship = Spaceship(self, self.screen)
-        self.spaceships = pg.sprite.Group(self.spaceship)
-        self.texts = pg.sprite.Group()
-
-        self.lifetext = TextDisplay(self.font, "VIDAS: {}".format(self.lives))
-        self.lifetext.rect.topright = [self.displayinfo.current_w - 20, 0 + 10]
-        self.texts.add(self.lifetext)
-
-        self.stop = False
-
-        for speed in STAR_SPEEDS:
-            self.generateField(STARS_AMOUNT, self.stars, Star, speed)
-        self.generateField(75, self.meteorites, Obstacle, 4)
-
-
-        self.newLevel = True
-        self.level = 0
-        self.font = None
-        
+        self.lives = LIVES
+        self.points = 0
+        self.levelnumber = 1
         self.levels = {1: (), 
                        2:(5,11,17,23,29,35,41), 
                        3: (5,11,17,23,29,35,41,6,7,8,9,10,18,19,20,21,22,30,31,32,33,34)
                        }
-        self.game_over = False
         self.clock = pg.time.Clock()
-
-    def generateField(self, amount : int, container : pg.sprite.Group, spritetype : pg.sprite.Sprite, speed = 1):
-        for i in range(amount):
-            position = [randint(0, self.displayinfo.current_w - 1), randint(0, self.displayinfo.current_h - 1)]
-            sprite = spritetype(self, self.screen, position = position, speed = speed)
-            container.add(sprite)
-        return container
-
-    def detectCollisions(self):
-        if self.stop == False:
-            for obstacle in self.meteorites:
-                if obstacle.rect.colliderect(self.spaceship.rect):
-                    self.lives -= 1
-                    self.stop = True
     
     def mainloop(self):
-        while not self.game_over:
-            self.clock.tick(60)
-            eventList = pg.event.get()
-            for event in eventList:
-                if event.type == pg.QUIT:
-                        self.game_over = True
-
-            self.detectCollisions()
-
-            self.screen.fill(BLACK)
-            self.stars.update()
-            self.meteorites.update()
-            self.spaceships.update()
-            self.lifetext.update("VIDAS: {}".format(self.lives))
-
-            
-
-            self.stars.draw(self.screen)
-            self.meteorites.draw(self.screen)
-            self.spaceships.draw(self.screen)
-            self.texts.draw(self.screen)
-            
-            pg.display.flip()
+        
+        level = Level(self.screen, self.font, self.clock, self.lives, self.points, self.levelnumber)
+        
+        
