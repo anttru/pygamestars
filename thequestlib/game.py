@@ -1,6 +1,6 @@
 import pygame as pg
 from thequestlib import FONT_SIZE, GAME_FONT, LIVES
-from thequestlib.modes import Level
+from thequestlib.levelmode import Level
 
 class Game:
     def __init__(self):
