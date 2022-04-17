@@ -9,7 +9,8 @@ ROCKETS_SPEED = 6
 ROCKETS_AMOUNT = 1
 SATELLITES_SPEED = 5
 SATELLITES_AMOUNT = 1
-
+LEVEL_MULTIPLIER = [3,1,2]
+MENU_SECONDS = 30
 
 POINTS_TO_PASS = 5
 LIVES = 3
@@ -24,6 +25,7 @@ SATELLITE_SPRITE = r'./resources/satellite.png'
 EXPLOSION_SPRITE = r'./resources/explosion{}.png'
 BACKGROUNDS = r'./resources/background{}.png'
 PLANET_SPRITE = r'./resources/planet.png'
+MENU_IMAGES = r'./resources/menuscreen{}.png'
 BACKGROUNDS_NUMBER = 3
 
 CRASH_SOUND = r'./resources/explosion.wav'
@@ -33,3 +35,20 @@ GAME_FONT = "freesansbold.ttf"
 FONT_SIZE = 32
 
 LEVEL_END_TEXT = ["LEVEL {level} FINISHED", "{points} EXTRA POINTS WILL BE AWARDED FOR LANDING", "PRESS SPACE TO CONTINUE"]
+RESOLUTION_SCALES = {
+    600  : 0.42,
+    664  : 0.46,
+    720  : 0.5,
+    768  : 0.53,
+    800  : 0.55,
+    864  : 0.6,
+    900  : 0.625,
+    960  : 0.66,
+    1024 : 0.71,
+    1050 : 0.72,
+    1080 : 0.75,
+    1152 : 0.8,
+    1200 : 0.83,
+    1440 : 1,
+    2160 : 1.5
+}

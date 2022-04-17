@@ -1,15 +1,16 @@
 import pygame
 from random import randint
-from thequestlib import ASTEROIDS_AMOUNT, ASTEROIDS_SPEED, BACKGROUNDS, BACKGROUNDS_NUMBER, EXPLOSION_SPRITE, EXPLOSION_STOP_FRAMES, FRAME_RATE, LEVEL_MUSIC, ROCKETS_AMOUNT, ROCKETS_SPEED, SATELLITES_AMOUNT, SATELLITES_SPEED, STAR_SPEEDS, STARS_AMOUNT
-from thequestlib.modes import Mode
+from thequestlib import ASTEROIDS_AMOUNT, ASTEROIDS_SPEED, BACKGROUNDS, BACKGROUNDS_NUMBER, EXPLOSION_SPRITE, EXPLOSION_STOP_FRAMES, FRAME_RATE, LEVEL_MULTIPLIER, LEVEL_MUSIC, ROCKETS_AMOUNT, ROCKETS_SPEED, SATELLITES_AMOUNT, SATELLITES_SPEED, STAR_SPEEDS, STARS_AMOUNT
+from thequestlib.textscreenmode import Mode
 from thequestlib.sprites import Asteroid, LivesText, PointsText, Rocket, Satellite, Spaceship, Star, Planet 
 
 class Level(Mode):
-    def __init__(self, screen : pygame.Surface, font : pygame.font.Font, clock : pygame.time.Clock, lives, points, levelnumber):
+    def __init__(self, screen : pygame.Surface, font : pygame.font.Font, clock : pygame.time.Clock, lives, points, levelnumber, scaling):
         self.screen = screen
         self.font = font
         self.levelnumber = levelnumber
         self.screencenter = [self.screen.get_width()//2, self.screen.get_height()//2]
+        self.scaling = scaling
         self.lives = lives
         self.finished = False
         self.dead = False
@@ -29,10 +30,10 @@ class Level(Mode):
         self.game_over = False
         self.clock = pygame.time.Clock()
         self.background = pygame.image.load(BACKGROUNDS.format(self.levelnumber % BACKGROUNDS_NUMBER)).convert()
+        if self.scaling != 1:
+            self.background = pygame.transform.rotozoom(self.background, 0, self.scaling)
         pygame.mixer.music.load(LEVEL_MUSIC)
         pygame.mixer.music.play(-1)
-
-        self.mainloop()
     
     def startlevel(self):
         self.spaceship = Spaceship(self, self.screen)
@@ -40,13 +41,13 @@ class Level(Mode):
         self.planet = Planet(self, self.screen)
         for speed in STAR_SPEEDS:
             self.generateField(STARS_AMOUNT, self.sprites, Star, speed)
-        self.generateField((self.levelnumber % 3) * ASTEROIDS_AMOUNT, self.sprites, Asteroid, ASTEROIDS_SPEED + self.levelnumber // 3)
-        self.generateField((self.levelnumber % 3) * ROCKETS_AMOUNT, self.sprites, Rocket, ROCKETS_SPEED + self.levelnumber // 3)
-        self.generateField((self.levelnumber % 3) * SATELLITES_AMOUNT, self.sprites, Satellite, SATELLITES_SPEED + self.levelnumber // 3)
+        self.generateField(LEVEL_MULTIPLIER[self.levelnumber % 3] * ASTEROIDS_AMOUNT, self.sprites, Asteroid, ASTEROIDS_SPEED + self.levelnumber // 3)
+        self.generateField(LEVEL_MULTIPLIER[self.levelnumber % 3] * ROCKETS_AMOUNT, self.sprites, Rocket, ROCKETS_SPEED + self.levelnumber // 3)
+        self.generateField(LEVEL_MULTIPLIER[self.levelnumber % 3] * SATELLITES_AMOUNT, self.sprites, Satellite, SATELLITES_SPEED + self.levelnumber // 3)
         self.sprites.add(self.spaceship)
-        self.sprites.add(self.lifetext)
         self.sprites.add(self.pointstext)
         self.sprites.add(self.planet)
+        self.sprites.add(self.lifetext)
 
     def generateField(self, amount : int, container : pygame.sprite.Group, spritetype : pygame.sprite.Sprite, speed = 1):
         for i in range(amount):
@@ -67,8 +68,8 @@ class Level(Mode):
                 if isinstance(obstacle, (Asteroid, Rocket, Satellite)):
                     if obstacle.rect.colliderect(self.spaceship.collisionbox):
                         self.lives -= 1
-                        self.thislevelpoints -= (self.levelnumber % 3) * 27
-                        self.points -= (self.levelnumber % 3) * 27 
+                        self.thislevelpoints -= LEVEL_MULTIPLIER[self.levelnumber % 3] * (ASTEROIDS_AMOUNT + ROCKETS_AMOUNT + SATELLITES_AMOUNT)
+                        self.points -= LEVEL_MULTIPLIER[self.levelnumber % 3] * (ASTEROIDS_AMOUNT + ROCKETS_AMOUNT + SATELLITES_AMOUNT) 
                         if self.points < 0:
                             self.points = 0
                         if self.thislevelpoints < 0:
@@ -97,7 +98,7 @@ class Level(Mode):
 
     def mainloop(self):
         while not self.game_over and not self.finished and not self.close:
-            self.clock.tick(FRAME_RATE)
+            self.clock.tick(FRAME_RATE* self.scaling)
 
             self.handlestop()
 
@@ -115,6 +116,5 @@ class Level(Mode):
             "lives"    : self.lives,
             "points"   : self.points,
             "dead"     : self.dead,
-            "finished" : self.finished,
             "close"    : self.close
         }
