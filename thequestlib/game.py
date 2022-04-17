@@ -1,12 +1,12 @@
-import pygame as pg
+import pygame
 from thequestlib import FONT_SIZE, GAME_FONT, LIVES
 from thequestlib.levelmode import Level
 
 class Game:
     def __init__(self):
-        self.displayinfo = pg.display.Info()
-        self.screen = pg.display.set_mode((self.displayinfo.current_w, self.displayinfo.current_h))
-        self.font = pg.font.Font(GAME_FONT, FONT_SIZE)
+        self.displayinfo = pygame.display.Info()
+        self.screen = pygame.display.set_mode((self.displayinfo.current_w, self.displayinfo.current_h))
+        self.font = pygame.font.Font(GAME_FONT, FONT_SIZE)
         self.flags = {
             "game_over": False,
             "next_level": True
@@ -19,7 +19,7 @@ class Game:
                        2:(5,11,17,23,29,35,41), 
                        3: (5,11,17,23,29,35,41,6,7,8,9,10,18,19,20,21,22,30,31,32,33,34)
                        }
-        self.clock = pg.time.Clock()
+        self.clock = pygame.time.Clock()
     
     def mainloop(self):
         
