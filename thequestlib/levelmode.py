@@ -12,11 +12,12 @@ class Level(Mode):
         self.screencenter = [self.screen.get_width()//2, self.screen.get_height()//2]
         self.scaling = scaling
         self.lives = lives
-        self.finished = False
-        self.dead = False
-        self.autopilot = False
         self.explosioncenter = None
-        self.close = False
+        self.flags = {
+            "dead"     : False,
+            "close"    : False,
+            "finished" : False
+        }
         self.lifetext = LivesText(self, self.font)
         self.lifetext.rect.topright = [self.screen.get_width() - 20, 0 + 10]
         self.points = points
@@ -76,7 +77,7 @@ class Level(Mode):
                             self.thislevelpoints = 0
                         self.explosioncenter = obstacle.rect.clip(self.spaceship.collisionbox).topleft
                         if self.lives < 0:
-                            self.dead = True
+                            self.flags["dead"] = True
                         self.stopframes += 1
                         self.spaceship.crashsound.play()
 
@@ -90,14 +91,14 @@ class Level(Mode):
         if self.stopframes > 0:
                 self.stopframes += 1
         if self.stopframes >= EXPLOSION_STOP_FRAMES:
-            if self.dead == True:
+            if self.flags["dead"] == True:
                 self.game_over = True
             self.startlevel()
             self.stopframes = 0
             self.explosioncenter = None
 
     def mainloop(self):
-        while not self.game_over and not self.finished and not self.close:
+        while not self.game_over and not self.flags["finished"] and not self.flags["close"]:
             self.clock.tick(FRAME_RATE* self.scaling)
 
             self.handlestop()
@@ -115,6 +116,6 @@ class Level(Mode):
         return {
             "lives"    : self.lives,
             "points"   : self.points,
-            "dead"     : self.dead,
-            "close"    : self.close
+            "dead"     : self.flags["dead"],
+            "close"    : self.flags["close"]
         }

@@ -1,3 +1,4 @@
+from operator import truediv
 import pygame
 from thequestlib import BLACK, FRAME_RATE, TEXT_SECONDS, WHITE
 
@@ -8,15 +9,21 @@ class Mode:
     def eventloop(self):
         eventList = pygame.event.get()
         for event in eventList:
+            if event.type == pygame.KEYDOWN:
+                self.handlekeypresses(event)
             if event.type == pygame.QUIT:
-                self.close = True
+                self.flags["close"] = True
+    def handlekeypresses(self, event):
+        pass
 
 class TextScreen(Mode):
-    def __init__(self, screen : pygame.Surface, text : list, font : pygame.font.Font, clock : pygame.time.Clock, levelnumber = None, scaling = 1, durationinsecs = TEXT_SECONDS, black = False):
+    def __init__(self, screen : pygame.Surface, text : list, font : pygame.font.Font, clock : pygame.time.Clock, levelnumber = 0, scaling = 1, durationinsecs = TEXT_SECONDS, black = False):
         self.screen = screen
-        self.black = False
-        self.exit = False
-        self.close = False
+        self.black = black
+        self.flags = {
+            "exit"  : False,
+            "close" : False
+        }
         self.clock = clock
         self.images = []
         self.textinfo = {"level": levelnumber, "points": levelnumber*100}
@@ -38,7 +45,7 @@ class TextScreen(Mode):
         self.calculatecoordinates()
         
     def mainloop(self):
-        while self.framecounter < self.duration and self.exit == False and self.close == False:
+        while self.framecounter < self.duration and self.flags["exit"] == False and self.flags["close"] == False:
             self.clock.tick(FRAME_RATE * self.scaling)
             self.eventloop()
             if self.black == True:
@@ -48,21 +55,16 @@ class TextScreen(Mode):
             pygame.display.flip()
             self.framecounter += 1
         return {
-            "close" : self.close,
+            "close" : self.flags["close"],
         }
     
     def calculatecoordinates(self):
-        textheight = self.images[0].get_height()
-        totalheight = len(self.images) * (textheight + 30)
+        textheight = self.images[0].get_height() + 30* self.scaling
+        totalheight = len(self.images) * (textheight)
         for i in range (len(self.images)):
             coordinates = (self.screen.get_width()//2 - self.images[i].get_width()//2, self.screen.get_height()//2 - totalheight//2 + i * textheight)
             self.linecoordinates.append(coordinates)
-        
-    def eventloop(self):
-        eventList = pygame.event.get()
-        for event in eventList:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    self.exit = True
-            if event.type == pygame.QUIT:
-                self.close = True
+
+    def handlekeypresses(self, event):
+        if event.key == pygame.K_SPACE:
+            self.flags["exit"] = True    

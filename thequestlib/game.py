@@ -1,6 +1,7 @@
 import pygame
 from thequestlib import FONT_SIZE, GAME_FONT, LIVES, RESOLUTION_SCALES
 from thequestlib.levelmode import Level
+from thequestlib.menumode import Mainmenu
 
 class Game:
     def __init__(self):
@@ -22,13 +23,18 @@ class Game:
         self.clock = pygame.time.Clock()
     
     def mainloop(self):
+        statusinfo = Mainmenu(self.screen, self.font, self.scaling, self.clock).mainloop()
+        self.flags["close"] = statusinfo["close"]
+        
         while not self.flags["dead"] and not self.flags["close"]:
             statusinfo = Level(self.screen, self.font, self.clock, self.lives, self.points, self.levelnumber, self.scaling).mainloop()
             self.lives = statusinfo["lives"]
             self.points = statusinfo["points"]
             self.flags["dead"] = statusinfo["dead"]
             self.flags["close"] = statusinfo["close"]
-            self.levelnumber += 1
-
+            if statusinfo["dead"] == False:
+                self.levelnumber += 1
+            else :
+                self.levelnumber = 1
        
         
