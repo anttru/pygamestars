@@ -1,8 +1,8 @@
 import pygame
 from random import randint
-from thequestlib import ASTEROIDS_AMOUNT, ASTEROIDS_SPEED, BACKGROUNDS, BACKGROUNDS_NUMBER, EXPLOSION_SPRITE, EXPLOSION_STOP_FRAMES, FRAME_RATE, LEVEL_MULTIPLIER, LEVEL_MUSIC, ROCKETS_AMOUNT, ROCKETS_SPEED, SATELLITES_AMOUNT, SATELLITES_SPEED, STAR_SPEEDS, STARS_AMOUNT
+from thequestlib import ASTEROIDS_AMOUNT, ASTEROIDS_SPEED, BACKGROUNDS, BACKGROUNDS_NUMBER, EXPLOSION_STOP_FRAMES, FRAME_RATE, LEVEL_MULTIPLIER, LEVEL_MUSIC, ROCKETS_AMOUNT, ROCKETS_SPEED, SATELLITES_AMOUNT, SATELLITES_SPEED, STAR_SPEEDS, STARS_AMOUNT
 from thequestlib.textscreenmode import Mode
-from thequestlib.sprites import Asteroid, LivesText, PointsText, Rocket, Satellite, Spaceship, Star, Planet 
+from thequestlib.sprites import Asteroid, Explosion, LivesText, PointsText, Rocket, Satellite, Spaceship, Star, Planet 
 
 class Level(Mode):
     def __init__(self, screen : pygame.Surface, font : pygame.font.Font, clock : pygame.time.Clock, lives, points, levelnumber, scaling):
@@ -12,24 +12,21 @@ class Level(Mode):
         self.screencenter = [self.screen.get_width()//2, self.screen.get_height()//2]
         self.scaling = scaling
         self.lives = lives
-        self.explosioncenter = None
         self.flags = {
             "dead"     : False,
             "close"    : False,
-            "finished" : False
+            "finished" : False,
+            "gameover" : False
         }
         self.lifetext = LivesText(self, self.font)
         self.lifetext.rect.topright = [self.screen.get_width() - 20, 0 + 10]
         self.points = points
         self.thislevelpoints = 0
         self.pointstext = PointsText(self, self.font)
-
-        
+                
         self.startlevel()
         self.stopframes = 0
-                
-        self.game_over = False
-        self.clock = pygame.time.Clock()
+        self.clock = clock
         self.background = pygame.image.load(BACKGROUNDS.format(self.levelnumber % BACKGROUNDS_NUMBER)).convert()
         if self.scaling != 1:
             self.background = pygame.transform.rotozoom(self.background, 0, self.scaling)
@@ -40,6 +37,7 @@ class Level(Mode):
         self.spaceship = Spaceship(self, self.screen)
         self.sprites = pygame.sprite.Group()
         self.planet = Planet(self, self.screen)
+        self.explosion = Explosion(self, self.screen)
         for speed in STAR_SPEEDS:
             self.generateField(STARS_AMOUNT, self.sprites, Star, speed)
         self.generateField(LEVEL_MULTIPLIER[self.levelnumber % 3] * ASTEROIDS_AMOUNT, self.sprites, Asteroid, ASTEROIDS_SPEED + self.levelnumber // 3)
@@ -49,6 +47,7 @@ class Level(Mode):
         self.sprites.add(self.pointstext)
         self.sprites.add(self.planet)
         self.sprites.add(self.lifetext)
+        self.sprites.add(self.explosion)
 
     def generateField(self, amount : int, container : pygame.sprite.Group, spritetype : pygame.sprite.Sprite, speed = 1):
         for i in range(amount):
@@ -56,13 +55,7 @@ class Level(Mode):
             sprite = spritetype(self, self.screen, position = position, speed = speed)
             container.add(sprite)
         return container
-
-    def explosion(self,position, framecounter):
-        if self.explosioncenter != None:
-            explosion = pygame.image.load(EXPLOSION_SPRITE.format(framecounter//10))
-            position = (position[0] - explosion.get_width()//2, position[1] - explosion.get_height()//2)
-            self.screen.blit(explosion, position)
-        
+       
     def detectCollisions(self):
         if self.stopframes == 0:
             for obstacle in self.sprites:
@@ -75,7 +68,7 @@ class Level(Mode):
                             self.points = 0
                         if self.thislevelpoints < 0:
                             self.thislevelpoints = 0
-                        self.explosioncenter = obstacle.rect.clip(self.spaceship.collisionbox).topleft
+                        self.explosion.position = obstacle.rect.clip(self.spaceship.collisionbox).topleft
                         if self.lives < 0:
                             self.flags["dead"] = True
                         self.stopframes += 1
@@ -85,24 +78,21 @@ class Level(Mode):
         for sprite in self.sprites:
             if isinstance(sprite, Star):
                 sprite.speed = 0
-            
-
+    
     def handlestop(self):
         if self.stopframes > 0:
                 self.stopframes += 1
-        if self.stopframes >= EXPLOSION_STOP_FRAMES:
+        if self.stopframes >= EXPLOSION_STOP_FRAMES * self.scaling:
             if self.flags["dead"] == True:
-                self.game_over = True
+                self.flags["gameover"] = True
             self.startlevel()
             self.stopframes = 0
-            self.explosioncenter = None
-
+    
     def mainloop(self):
-        while not self.game_over and not self.flags["finished"] and not self.flags["close"]:
+        while not self.flags["gameover"] and not self.flags["finished"] and not self.flags["close"]:
             self.clock.tick(FRAME_RATE* self.scaling)
 
             self.handlestop()
-
             self.eventloop()
            
             self.detectCollisions()
@@ -110,8 +100,6 @@ class Level(Mode):
                                     
             self.screen.blit(self.background, [0,0])
             self.sprites.draw(self.screen)
-            self.explosion(self.explosioncenter, self.stopframes)
-            
             pygame.display.flip()
         return {
             "lives"    : self.lives,

@@ -1,6 +1,6 @@
 from random import randint
 import pygame
-from thequestlib import CRASH_SOUND, LEVEL_END_TEXT, LIVES, METEORITE_SPRITE, PLANET_SPRITE, POINTS_TO_PASS, ROCKET_SPRITE1, ROCKET_SPRITE2, SATELLITE_SPRITE, SPACESHIP_SPRITE, WHITE
+from thequestlib import CRASH_SOUND, EXPLOSION_SPRITE, LEVEL_END_TEXT, LIVES, METEORITE_SPRITE, PLANET_SPRITE, POINTS_TO_PASS, ROCKET_SPRITE1, ROCKET_SPRITE2, SATELLITE_SPRITE, SPACESHIP_SPRITE, WHITE
 from thequestlib.textscreenmode import TextScreen
 
 class SpaceThing(pygame.sprite.Sprite):
@@ -131,6 +131,36 @@ class Planet(SpaceThing):
             self.level.stopstars()
             self.level.spaceship.autopilot = True
 
+class Explosion(SpaceThing):
+    def __init__(self, level, screen : pygame.Surface, position = [0,0], speed = 0):
+        explosion = pygame.image.load(EXPLOSION_SPRITE.format(0))
+        super().__init__(level, screen, explosion)
+        self.level = level
+        self.screen = screen
+        self.explosionimages = []
+        self.position = (-500, -500)
+        self.rect.topleft = (-500, -500)
+        self.framecounter = 0
+        self.imageiterator = 0
+        self.durationinframes = 10 * self.level.scaling
+        for i in range(11):
+            explosion = pygame.transform.rotozoom(pygame.image.load(EXPLOSION_SPRITE.format(i)), 0, self.level.scaling)
+            self.explosionimages.append(explosion)
+        self.image = self.explosionimages[0]
+    def update(self):
+        if self.position[0] > 0:
+            self.rect.center = self.position
+            self.image = self.explosionimages[self.imageiterator]
+            self.framecounter += 1
+            if self.framecounter > self.durationinframes and self.imageiterator < len(self.explosionimages) - 1:
+                self.imageiterator += 1
+                self.framecounter = 0
+            if self.framecounter >= 120 * self.level.scaling:
+                self.position = (-500, -500)
+                self.rect.topleft = (-500, -500)
+                self.image = pygame.image.load(EXPLOSION_SPRITE.format(0))
+
+
 class TextDisplay(pygame.sprite.Sprite):
     def __init__(self, level, font : pygame.font.Font, text = "", position = [0,0]):
         super().__init__()
@@ -149,7 +179,7 @@ class TextDisplay(pygame.sprite.Sprite):
         self.image = self.font.render(self.text, True, WHITE)
         if self.level.scaling != 1:
             self.image = pygame.transform.rotozoom(self.image, 0, self.level.scaling)
-        
+    
 class LivesText(TextDisplay):
     def __init__(self, level, font: pygame.font.Font):
         super().__init__(level, font, text = "LIVES: {}".format(LIVES), position = [0,0])

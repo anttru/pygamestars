@@ -20,6 +20,7 @@ class TextScreen(Mode):
     def __init__(self, screen : pygame.Surface, text : list, font : pygame.font.Font, clock : pygame.time.Clock, levelnumber = 0, scaling = 1, durationinsecs = TEXT_SECONDS, black = False):
         self.screen = screen
         self.black = black
+        self.font = font
         self.flags = {
             "exit"  : False,
             "close" : False
@@ -29,17 +30,14 @@ class TextScreen(Mode):
         self.textinfo = {"level": levelnumber, "points": levelnumber*100}
         self.scaling = scaling
         for line in text:
-            if self.scaling == 1:
-                self.images.append(font.render(line.format(**self.textinfo), True, WHITE))
-            else: 
-                self.images.append(pygame.transform.rotozoom(font.render(line.format(**self.textinfo), True, WHITE), 0, self.scaling))
+            self.images.append(pygame.transform.rotozoom(font.render(line.format(**self.textinfo), True, WHITE), 0, self.scaling))
         
         if self.scaling != 1:
             for image in self.images:
                 image = pygame.transform.rotozoom(image, 0, self.scaling)
                  
         self.framecounter = 0
-        self.duration = FRAME_RATE * durationinsecs
+        self.duration = FRAME_RATE * durationinsecs * scaling 
 
         self.linecoordinates = []
         self.calculatecoordinates()

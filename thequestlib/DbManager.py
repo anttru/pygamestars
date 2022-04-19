@@ -1,43 +1,40 @@
 import sqlite3
-from thequestlib import DATABASE_FILE, HIGHSCORE_HEADER
+from thequestlib import DATABASE_FILE, HIGHSCORE_HEADER1, HIGHSCORE_HEADER2, HIGHSCORE_HEADER3
 import sqlite3
 
-
-class DbManager:
-    def __init__(self):
-        self.con = sqlite3.connect(DATABASE_FILE)
-        self.cur = self.con.cursor()
-
-class ScoreGetter(DbManager):
-    def __init__(self):
-        super().__init__()
-        self.cur.execute("""
+def getScores():
+    con = sqlite3.connect(DATABASE_FILE)
+    cur = con.cursor()
+    cur.execute("""
             SELECT name, points
             FROM highscores
             ORDER BY points DESC
             LIMIT 10;
             """)
-        self.topscores = self.cur.fetchall()
-        self.text = HIGHSCORE_HEADER
-        self.con.close()
+    topscores = cur.fetchall()
+    con.close()
+    text = []
+    text.append(HIGHSCORE_HEADER1)
+    text.append(HIGHSCORE_HEADER2)
+    text.append(HIGHSCORE_HEADER2)
+    text.append(HIGHSCORE_HEADER3)
+    i = 1
+    for score in topscores:
+        text.append("{:0>2}.......................{}...........{:0>10}".format(i, score[0], score[1]))
+        i += 1
+    text.append("")
+    text.append("")
+    text.append("press space to return to main menu")
+    return [text, topscores]
 
-    def createtext(self):
-        i = 1
-        for score in self.topscores:
-            self.text.append("{:0>2}.......................{}...........{:0>10}".format(i, score[0], score[1]))
-            i += 1
-        self.text.append("")
-        self.text.append("")
-        self.text.append("press space to return to main menu")
-        return self.text
-    
-class ScoreAdder(DbManager):
-    def __init__(self, name, points):
-        super().__init__()
-        self.cur.execute("""
-                        INSERT INTO highscores (name, points)
-                        VALUES (?,?)
-                        """, [name, points])
-        self.con.commit()
-        self.con.close()
+
+def addScore(name, points):
+    con = sqlite3.connect(DATABASE_FILE)
+    cur = con.cursor()
+    cur.execute("""
+                INSERT INTO highscores (name, points)
+                VALUES (?,?)
+                """, [name, points])
+    con.commit()
+    con.close()
         
