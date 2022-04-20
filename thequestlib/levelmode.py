@@ -29,7 +29,7 @@ class Level(Mode):
         self.clock = clock
         self.background = pygame.image.load(BACKGROUNDS.format(self.levelnumber % BACKGROUNDS_NUMBER)).convert()
         if self.scaling != 1:
-            self.background = pygame.transform.rotozoom(self.background, 0, self.scaling)
+            self.background = pygame.transform.rotozoom(self.background, 0, self.scaling).convert()
         pygame.mixer.music.load(LEVEL_MUSIC)
         pygame.mixer.music.play(-1)
     

@@ -24,10 +24,10 @@ ROCKET_SPRITE1 = r'./resources/rocket1.png'
 ROCKET_SPRITE2 = r'./resources/rocket2.png'
 SATELLITE_SPRITE = r'./resources/satellite.png'
 EXPLOSION_SPRITE = r'./resources/explosion{}.png'
-BACKGROUNDS = r'./resources/background{}.png'
+BACKGROUNDS = r'./resources/backgrounds/background{}.png'
 PLANET_SPRITE = r'./resources/planet.png'
 MENU_IMAGES = r'./resources/menuscreen{}.png'
-BACKGROUNDS_NUMBER = 3
+BACKGROUNDS_NUMBER = 10
 
 MENU_SOUND = r'./resources/menusound.wav'
 CRASH_SOUND = r'./resources/explosion.wav'
