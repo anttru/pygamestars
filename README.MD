@@ -22,3 +22,6 @@ Abrir la carpeta Winpython64-3.10.2.0dot , dentro de esta la carpeta WPy64-31020
 
 Arrastrar el archivo launcher.py y soltarlo sobre el archivo WinPython Control Panel.exe, se lanzará el juego.
 
+## Notas
+
+El juego se escala para multiples resoluciones, pero la resolución nativa es 2560x1440, a resoluciones más bajas los frames bajan en proporción al tamaño de la pantalla.
