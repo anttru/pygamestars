@@ -25,3 +25,4 @@ Arrastrar el archivo launcher.py y soltarlo sobre el archivo WinPython Control P
 ## Notas
 
 El juego se escala para multiples resoluciones, pero la resolución nativa es 2560x1440, a resoluciones más bajas los frames bajan en proporción al tamaño de la pantalla.
+El menu principal alterna entre la pantalla de records y la del menu cada pocos segundos de inactividad.
