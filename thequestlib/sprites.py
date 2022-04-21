@@ -12,16 +12,22 @@ class SpaceThing(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = position
         self.speed = speed
+        self.position = position
 
     def update(self):
         if self.level.stopframes == 0:
-            self.rect.x -= self.speed
-            if ((self.rect.x + self.image.get_width()) <= 0) and (self.level.thislevelpoints < POINTS_TO_PASS * self.level.levelnumber):
-                self.rect.x = self.screen.get_width() - 1
-                self.rect.y = randint(0, self.screen.get_height() - 1)
-                if isinstance(self, (Asteroid, Rocket, Satellite)):
+            self.position[0] -= self.speed
+            self.rect.x = self.position[0]
+            if ((self.position[0] + self.image.get_width()) <= 0):
+                if isinstance(self, (Asteroid, Rocket, Satellite)) and self.level.thislevelpoints < POINTS_TO_PASS * self.level.levelnumber:
                     self.level.points += 1
                     self.level.thislevelpoints += 1
+                if not ((self.level.thislevelpoints >= POINTS_TO_PASS * self.level.levelnumber) and isinstance(self, (Asteroid, Rocket, Satellite))):
+                    self.position[0] = self.screen.get_width() - 1
+                    self.rect.x = self.position[0]
+                    self.position[1] = randint(0, self.screen.get_height() - 1)
+                    self.rect.y = self.position[1]
+                
     
     def loadandscaleimage(self, surface):
         self.image = pygame.transform.rotozoom(surface, 0, self.level.scaling)
@@ -30,36 +36,33 @@ class Star(SpaceThing):
     def __init__(self, level, screen : pygame.Surface, position = [0,0], speed = 1):
         super().__init__(level, screen, pygame.Surface((2, 2)) ,position, speed)
         self.image.fill(WHITE)
-    def update(self):
-        if self.level.stopframes == 0:
-            self.rect.x -= self.speed
-            if ((self.rect.x + self.image.get_width()) <= 0): 
-                self.rect.x = self.screen.get_width() - 1
-                self.rect.y = randint(0, self.screen.get_height() - 1)
-    
+        
 class Rocket(SpaceThing):
     def __init__(self, level, screen : pygame.Surface, position = [0,0], speed = 6):
         self.animationcounter = 0
         super().__init__(level, screen, pygame.image.load(ROCKET_SPRITE1) ,position, speed)
         self.images = [self.image, pygame.transform.rotozoom(pygame.image.load(ROCKET_SPRITE2), 0, self.level.scaling)]
+        self.position[0] += self.level.screencenter[0]
         self.rect.centerx += self.level.screencenter[0]
 
     def update(self):
         self.animationcounter += 1
-        if self.animationcounter > 19:
+        if self.animationcounter > 39:
             self.animationcounter = 0
-        self.image = self.images[self.animationcounter // 10]
+        self.image = self.images[self.animationcounter // 20]
         super().update()
 
 class Satellite(SpaceThing):
     def __init__(self, level, screen: pygame.Surface, position=[0, 0], speed = 5):
         super().__init__(level, screen, pygame.image.load(SATELLITE_SPRITE), position, speed)
-        self.rect.centerx += self.screen.get_width()//2
+        self.position[0] += self.level.screencenter[0]
+        self.rect.centerx += self.level.screencenter[0]
 
 class Asteroid(SpaceThing):
     def __init__(self, level, screen : pygame.Surface, position = [0,0], speed = 4):
         super().__init__(level, screen, pygame.image.load(METEORITE_SPRITE) ,position, speed)
-        self.rect.centerx += self.screen.get_width()//2
+        self.position[0] += self.level.screencenter[0]
+        self.rect.centerx += self.level.screencenter[0]
        
 class Spaceship(pygame.sprite.Sprite):
     def __init__(self, level,  screen : pygame.Surface):
@@ -108,7 +111,7 @@ class Spaceship(pygame.sprite.Sprite):
                 self.rect.centerx += 5
             if self.rect.topright[0] >= self.screen.get_width() *3 // 4 and self.totalrotation >= 180:
                 self.level.flags["finished"] = True
-                self.level.points += 100 * self.level.levelnumber
+                self.level.points += POINTS_TO_PASS * self.level.levelnumber
                 self.level.flags["close"] = TextScreen(self.screen, LEVEL_END_TEXT, self.level.font, self.level.clock, self.level.levelnumber, self.level.scaling).mainloop()["close"]
                   
     def rotatespaceship(self):
@@ -120,13 +123,14 @@ class Spaceship(pygame.sprite.Sprite):
 
 class Planet(SpaceThing):
     def __init__(self, level, screen: pygame.Surface, position=[0, 0], speed=1):
-        super().__init__(level, screen, pygame.image.load(PLANET_SPRITE),position , speed)
-        self.rect.x =  self.screen.get_width()
-        self.rect.centery = self.level.screencenter[1]
-    
+        super().__init__(level, screen, pygame.image.load(PLANET_SPRITE), position , speed)
+        self.position = [self.screen.get_width(), self.level.screencenter[1]]
+        self.rect.midleft = self.position  
+            
     def update(self):
         if self.level.thislevelpoints >= POINTS_TO_PASS * self.level.levelnumber and self.rect.x > self.screen.get_width() * 3 // 4:
-            self.rect.x -= self.speed
+            self.position[0] -= self.speed
+            self.rect.midleft = self.position
         if self.rect.x <= self.screen.get_width() * 3 // 4:
             self.level.stopstars()
             self.level.spaceship.autopilot = True

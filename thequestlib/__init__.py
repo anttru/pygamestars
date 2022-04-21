@@ -15,7 +15,7 @@ MENU_SECONDS = 7
 POINTS_TO_PASS = 100
 LIVES = 3
 TEXT_SECONDS = 45
-FRAME_RATE = 60
+FRAME_RATE = 120
 EXPLOSION_STOP_FRAMES = 120 #this % 10 cant be bigger than the amount of frames for the explosion
 
 SPACESHIP_SPRITE = r'./resources/spaceship.png'

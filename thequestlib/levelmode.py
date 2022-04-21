@@ -1,6 +1,6 @@
 import pygame
 from random import randint
-from thequestlib import ASTEROIDS_AMOUNT, ASTEROIDS_SPEED, BACKGROUNDS, BACKGROUNDS_NUMBER, EXPLOSION_STOP_FRAMES, FRAME_RATE, LEVEL_MULTIPLIER, LEVEL_MUSIC, ROCKETS_AMOUNT, ROCKETS_SPEED, SATELLITES_AMOUNT, SATELLITES_SPEED, STAR_SPEEDS, STARS_AMOUNT
+from thequestlib import ASTEROIDS_AMOUNT, ASTEROIDS_SPEED, BACKGROUNDS, BACKGROUNDS_NUMBER, EXPLOSION_STOP_FRAMES, FRAME_RATE, LEVEL_MULTIPLIER, LEVEL_MUSIC, POINTS_TO_PASS, ROCKETS_AMOUNT, ROCKETS_SPEED, SATELLITES_AMOUNT, SATELLITES_SPEED, STAR_SPEEDS, STARS_AMOUNT
 from thequestlib.textscreenmode import Mode
 from thequestlib.sprites import Asteroid, Explosion, LivesText, PointsText, Rocket, Satellite, Spaceship, Star, Planet 
 
@@ -22,6 +22,7 @@ class Level(Mode):
         self.lifetext.rect.topright = [self.screen.get_width() - 20, 0 + 10]
         self.points = points
         self.thislevelpoints = 0
+        self.startingpoints = self.points
         self.pointstext = PointsText(self, self.font)
                 
         self.startlevel()
@@ -64,8 +65,8 @@ class Level(Mode):
                         self.lives -= 1
                         self.thislevelpoints -= LEVEL_MULTIPLIER[self.levelnumber % 3] * (ASTEROIDS_AMOUNT + ROCKETS_AMOUNT + SATELLITES_AMOUNT)
                         self.points -= LEVEL_MULTIPLIER[self.levelnumber % 3] * (ASTEROIDS_AMOUNT + ROCKETS_AMOUNT + SATELLITES_AMOUNT) 
-                        if self.points < 0:
-                            self.points = 0
+                        if self.points < self.startingpoints:
+                            self.points = self.startingpoints
                         if self.thislevelpoints < 0:
                             self.thislevelpoints = 0
                         self.explosion.position = obstacle.rect.clip(self.spaceship.collisionbox).topleft

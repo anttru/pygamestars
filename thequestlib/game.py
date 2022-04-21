@@ -33,19 +33,21 @@ class Game:
             
             while not self.flags["dead"] and not self.flags["close"]:
                 self.flags["close"] = TextScreen(self.screen, ["LEVEL {}".format(self.levelnumber)], self.font, self.clock, scaling = self.scaling, durationinsecs = 2, black = True).mainloop()["close"]
-                statusinfo = Level(self.screen, self.font, self.clock, self.lives, self.points, self.levelnumber, self.scaling).mainloop()
-                self.lives = statusinfo["lives"]
-                self.points = statusinfo["points"]
-                self.flags["dead"] = statusinfo["dead"]
-                self.flags["close"] = statusinfo["close"]
-                if statusinfo["dead"] == False:
+                if self.flags["close"] == False:
+                    statusinfo = Level(self.screen, self.font, self.clock, self.lives, self.points, self.levelnumber, self.scaling).mainloop()
+                    self.lives = statusinfo["lives"]
+                    self.points = statusinfo["points"]
+                    self.flags["dead"] = statusinfo["dead"]
+                    self.flags["close"] = statusinfo["close"]
+                if statusinfo["dead"] == False and self.flags["close"] == False:
                     self.levelnumber += 1
-                else :
+                elif self.flags["close"] == False:
                     self.flags["close"] = TextScreen(self.screen, ["GAME OVER"], self.font, self.clock, scaling = self.scaling, durationinsecs = 2, black = True).mainloop()["close"]
                     self.levelnumber = 1
-                    if self.points > self.scoretobeat:
+                    if (self.points > self.scoretobeat) and self.flags["close"] == False:
                         self.flags["close"] = InputName(self.screen, HIGHSCORE_SAVE_TEXT, self.clock, self.scaling, self.points).mainloop()["close"]
-                    self.flags["close"] = TextScreen(self.screen, getScores()[0], self.font, self.clock, scaling = self.scaling, black = True, durationinsecs= 8).mainloop()["close"]
+                    if self.flags["close"] == False:
+                        self.flags["close"] = TextScreen(self.screen, getScores()[0], self.font, self.clock, scaling = self.scaling, black = True, durationinsecs= 8).mainloop()["close"]
             self.flags["dead"] = False
             self.points = 0
             self.lives = 3
