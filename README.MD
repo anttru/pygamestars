@@ -14,7 +14,7 @@ Abrir la carpeta del repositorio ( descomprimido si lo bajamos en .zip) en VCS
 Abrir el fichero launcher.py y darle a ejecutar en VCS.
 ## Instalacion para no programadores:
 
-Descargar https://mega.nz/file/0CxDAAKA#McIpTrG8kOHWbDwuSEw4qRgFbyljBBwPmheQh1A14uA
+Descargar https://mega.nz/file/4HYzXLxL#V5KLVpM-MjyXNXDFhymaDOuXVpgMKnJDGQbciFQg_Tc
 
 Descomprimir la carpeta
 
