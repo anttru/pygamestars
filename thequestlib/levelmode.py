@@ -1,6 +1,6 @@
 import pygame
 from random import randint
-from thequestlib import ASTEROIDS_AMOUNT, ASTEROIDS_SPEED, BACKGROUNDS, BACKGROUNDS_NUMBER, EXPLOSION_STOP_FRAMES, FRAME_RATE, LEVEL_MULTIPLIER, LEVEL_MUSIC, POINTS_TO_PASS, ROCKETS_AMOUNT, ROCKETS_SPEED, SATELLITES_AMOUNT, SATELLITES_SPEED, STAR_SPEEDS, STARS_AMOUNT
+from thequestlib import ASTEROIDS_AMOUNT, ASTEROIDS_SPEED, BACKGROUNDS, BACKGROUNDS_NUMBER, EXPLOSION_STOP_FRAMES, FRAME_RATE, LEVEL_MULTIPLIER, LEVEL_MUSIC, PLANET_SPEED, POINTS_TO_PASS, ROCKETS_AMOUNT, ROCKETS_SPEED, SATELLITES_AMOUNT, SATELLITES_SPEED, STAR_SPEEDS, STARS_AMOUNT
 from thequestlib.textscreenmode import Mode
 from thequestlib.sprites import Asteroid, Explosion, LivesText, PointsText, Rocket, Satellite, Spaceship, Star, Planet 
 
@@ -37,7 +37,7 @@ class Level(Mode):
     def startlevel(self):
         self.spaceship = Spaceship(self, self.screen)
         self.sprites = pygame.sprite.Group()
-        self.planet = Planet(self, self.screen)
+        self.planet = Planet(self, self.screen, speed = PLANET_SPEED)
         self.explosion = Explosion(self, self.screen)
         for speed in STAR_SPEEDS:
             self.generateField(STARS_AMOUNT, self.sprites, Star, speed)
