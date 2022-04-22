@@ -29,6 +29,8 @@ Seguir bajando hasta "Buscar otra aplicación en el equipo", navegar hasta donde
 Tras esto, podremos hacer doble clic (sin necesidad de arrastar y soltar sobre el interpreter) sobre launcher.py para lanzar el juego. Podemos crear un acceso directo en el escritorio o donde queramos para launcher.py.
 
 ## Notas
+En __ini__.py pueden cambiarse muchos valores del juego, como las velocidades, vidas, puntos para pasar un nivel, puede ser útil para hacer pruebas. La velocidad del planeta nunca debe ser superior a la velocidad del obstaculo más lento dividad entre cuatro (acepta decimales).
 
 El juego se escala para multiples resoluciones, pero la resolución nativa es 2560x1440, a resoluciones más bajas los frames bajan en proporción al tamaño de la pantalla.
+
 El menu principal alterna entre la pantalla de records y la del menu cada pocos segundos de inactividad.
