@@ -34,3 +34,5 @@ En __ini__.py pueden cambiarse muchos valores del juego, como las velocidades, v
 El juego se escala para multiples resoluciones, pero la resolución nativa es 2560x1440, a resoluciones más bajas los frames bajan en proporción al tamaño de la pantalla.
 
 El menu principal alterna entre la pantalla de records y la del menu cada pocos segundos de inactividad.
+
+Los backgrounds son de norma2D y el tema de guitarra de bboynoe. 
